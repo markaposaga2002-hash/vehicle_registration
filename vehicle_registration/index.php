@@ -1,5 +1,9 @@
 <?php
 
+// Start the session before reading or writing any session data (including the CSRF token).
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
 
 require __DIR__ . '/db_connect.php';
 
@@ -42,7 +46,7 @@ function validDate(string $date): bool {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!hash_equals($_SESSION['csrf'], $_POST['csrf'] ?? '')) {
+    if (empty($_SESSION['csrf']) || !hash_equals($_SESSION['csrf'], $_POST['csrf'] ?? '')) {
         http_response_code(403);
         exit('Invalid request token. Refresh the page and try again.');
     }
